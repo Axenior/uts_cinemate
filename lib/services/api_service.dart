@@ -17,6 +17,19 @@ class ApiService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> searchTeams(String query) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/searchteams.php?t=$query'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data['teams']);
+    } else {
+      throw Exception('Failed to search teams');
+    }
+  }
+
   Future<List<dynamic>> searchPlayers(String query) async {
     final response = await http.get(
       Uri.parse('$baseUrl/searchplayers.php?p=$query'),
