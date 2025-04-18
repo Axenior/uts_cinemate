@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:uts_cinemate/models/leaderboard.dart';
 
 class ApiService {
   static const String baseUrl = "https://www.thesportsdb.com/api/v1/json/3";
@@ -25,13 +26,26 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      // Filter hanya pemain Soccer
       final players = data['player'] as List<dynamic>?;
       if (players == null) return [];
 
       return players.where((p) => p['strSport'] == 'Soccer').toList();
     } else {
       throw Exception('Failed to load players');
+    }
+  }
+
+  Future<List<Leaderboard>> getLeaderboard(String leagueId) async {
+    final url = Uri.parse('$baseUrl/lookuptable.php?l=$leagueId&s=2024-2025');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List leaderboardJson = data['table'];
+
+      return leaderboardJson.map((json) => Leaderboard.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load leaderboard');
     }
   }
 }
